@@ -7,10 +7,12 @@
 
 using namespace std;
 
+#define MAX_SIZE 500
+
 struct Node {
 	string w;
 	string wk;
-};
+}nodes[MAX_SIZE];
 
 map<string, int> id1;
 int id_cnt = 0;
@@ -131,14 +133,18 @@ void input() {
 void getData()
 {
 	ifstream fin{ "attendance_weekday_500.txt" }; //500개 데이터 입력
-	for (int i = 0; i < 500; i++) {
-		string t1, t2;
-		fin >> t1 >> t2;
-		calculateScore (t1, t2);
-	}
+	for (int i = 0; i < MAX_SIZE; i++)
+		fin >> nodes[i].w >> nodes[i].wk;
+}
+
+void getScore()
+{
+	for (int i = 0; i < MAX_SIZE; i++)
+		calculateScore(nodes[i].w, nodes[i].wk);
 }
 
 int main() {
 	getData();
+	getScore();
 	input();
 }
