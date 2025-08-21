@@ -99,3 +99,22 @@ TEST_F(AttendanceManagement_test, TestDisplayResults) {
     EXPECT_NE(output.find("POINT :"), std::string::npos);
     EXPECT_NE(output.find("GRADE :"), std::string::npos);
 }
+
+TEST_F(AttendanceManagement_test, TestJudgeGradeUpdateScore) {
+    am.calculateScore("Charlie", "monday");
+    int id = am.getUserId("Charlie");
+
+    // SILVER if the score is 10 or more
+    am.setGradeThreshold(GRADE_SILVER, 10);
+    for (int i = 0; i < 10; i++)
+        am.calculateScore("Charlie", "monday");
+    am.judgeGrade();
+    EXPECT_EQ(am.getGrade(id), GRADE_SILVER);
+
+    // GOLD if the score is 10 or more
+    am.setGradeThreshold(GRADE_GOLD, 20);
+    for (int i = 0; i < 10; i++)
+        am.calculateScore("Charlie", "monday");
+    am.judgeGrade();
+    EXPECT_EQ(am.getGrade(id), GRADE_GOLD);
+}
