@@ -1,11 +1,12 @@
-#include <iostream>
-#include <fstream>
-#include <string>
-#include <map>
-#include <vector>
-#include <algorithm>
+#pragma once
 
-using namespace std;
+#include "IAttendanceManager.h"
+#include <map>
+#include <string>
+#include <vector>
+#include <fstream>
+#include <iostream>
+#include <algorithm>
 
 #define MAX_DATA_SIZE 500
 #define MAX_USER_SIZE 100
@@ -16,94 +17,76 @@ using namespace std;
 
 #define GRADE_NORMAL 0
 #define GRADE_GOLD 1
-#define GRADE_SILVER 2  // 기존 GRAGE_SILVER 오타 수정
+#define GRADE_SILVER 2
 
 struct Node {
-    string w;
-    string wk;
+    std::string w;
+    std::string wk;
 };
 
-enum Day { Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday, InvalidDay };
-
-class AttendanceManager {
+class AttendanceManager : public IAttendanceManager {
 private:
     Node nodes[MAX_DATA_SIZE];
-    map<string, int> userIds;
+    std::map<std::string, int> userIds;
     int id_cnt = 0;
 
     int dat[MAX_USER_SIZE][MAX_DAYS_SIZE] = { 0 };
     int points[MAX_USER_SIZE] = { 0 };
     int grade[MAX_USER_SIZE] = { 0 };
-    string names[MAX_USER_SIZE];
+    std::string names[MAX_USER_SIZE];
 
     int wed[MAX_USER_SIZE] = { 0 };
     int weeken[MAX_USER_SIZE] = { 0 };
 
-    Day stringToDay(const string& wk) {
+    std::vector<GradeInfo> gradeInfos = {
+        { GRADE_GOLD, "GOLD", SCORE_GOLD },
+        { GRADE_SILVER, "SILVER", SCORE_SILVER },
+        { GRADE_NORMAL, "NORMAL", 0 }
+    };
+
+    Day stringToDay(const std::string& wk) {
         if (wk == "monday") return Monday;
-        else if (wk == "tuesday") return Tuesday;
-        else if (wk == "wednesday") return Wednesday;
-        else if (wk == "thursday") return Thursday;
-        else if (wk == "friday") return Friday;
-        else if (wk == "saturday") return Saturday;
-        else if (wk == "sunday") return Sunday;
-        else return InvalidDay;
+        if (wk == "tuesday") return Tuesday;
+        if (wk == "wednesday") return Wednesday;
+        if (wk == "thursday") return Thursday;
+        if (wk == "friday") return Friday;
+        if (wk == "saturday") return Saturday;
+        if (wk == "sunday") return Sunday;
+        return InvalidDay;
     }
-
-    struct GradeInfo {
-        int gradeId;
-        string gradeName;
-        int minScore;
-    };
-
-    vector<GradeInfo> gradeInfos = {
-        {1, "GOLD", SCORE_GOLD},
-        {2, "SILVER", SCORE_SILVER},
-        {0, "NORMAL", 0}
-    };
 
 public:
-    int getUserId(const string& username) const {
+    int getUserId(const std::string& username) const override {
         auto it = userIds.find(username);
-        if (it != userIds.end())
-            return it->second;
-        return -1; // 없는 사용자면 -1 반환
+        return (it != userIds.end()) ? it->second : -1;
     }
 
-    int getDat(int userId, Day day) const {
+    int getDat(int userId, Day day) const override {
         if (userId > 0 && userId < MAX_USER_SIZE && day >= Monday && day <= Sunday)
             return dat[userId][day];
         return -1;
     }
 
-    int getPoints(int userId) const {
-        if (userId > 0 && userId < MAX_USER_SIZE)
-            return points[userId];
-        return -1;
+    int getPoints(int userId) const override {
+        return (userId > 0 && userId < MAX_USER_SIZE) ? points[userId] : -1;
     }
 
-    int getGrade(int userId) const {
-        if (userId > 0 && userId < MAX_USER_SIZE)
-            return grade[userId];
-        return -1;
+    int getGrade(int userId) const override {
+        return (userId > 0 && userId < MAX_USER_SIZE) ? grade[userId] : -1;
     }
 
-    int getWed(int userId) const {
-        if (userId > 0 && userId < MAX_USER_SIZE)
-            return wed[userId];
-        return -1;
+    int getWed(int userId) const override {
+        return (userId > 0 && userId < MAX_USER_SIZE) ? wed[userId] : -1;
     }
 
-    int getWeeken(int userId) const {
-        if (userId > 0 && userId < MAX_USER_SIZE)
-            return weeken[userId];
-        return -1;
+    int getWeeken(int userId) const override {
+        return (userId > 0 && userId < MAX_USER_SIZE) ? weeken[userId] : -1;
     }
 
-    void getData() {
-        ifstream fin{ "../AttendanceManagement/attendance_weekday_500.txt" };
+    void getData() override {
+        std::ifstream fin{ "../AttendanceManagement/attendance_weekday_500.txt" };
         if (!fin) {
-            cerr << "Failed to open file\n";
+            std::cerr << "Failed to open file\n";
             return;
         }
         for (int i = 0; i < MAX_DATA_SIZE; i++)
@@ -111,67 +94,39 @@ public:
         fin.close();
     }
 
-    void calculateScore(const string& w, const string& wk) {
-        // ID 부여
+    void calculateScore(const std::string& w, const std::string& wk) override {
         if (userIds.count(w) == 0) {
-            userIds.insert({ w, ++id_cnt });
+            userIds[w] = ++id_cnt;
             names[id_cnt] = w;
         }
         int id = userIds[w];
-
         Day day = stringToDay(wk);
-        if (day == InvalidDay) return;  // 유효하지 않은 요일 처리
+        if (day == InvalidDay) return;
 
-        dat[id][day] += 1;
+        dat[id][day]++;
 
         switch (day) {
-        case Monday:
-            points[id]++;
-            break;
-        case Tuesday:
-            points[id]++;
-            break;
-        case Wednesday:
-            points[id] += 3;
-            wed[id]++;
-            break;
-        case Thursday:
-            points[id]++;
-            break;
-        case Friday:
-            points[id]++;
-            break;
-        case Saturday:
-            points[id] += 2;
-            weeken[id]++;
-            break;
-        case Sunday:
-            points[id] += 2;
-            weeken[id]++;
-            break;
-        default:
-            break;
+        case Monday: case Tuesday: case Thursday: case Friday: points[id]++; break;
+        case Wednesday: points[id] += 3; wed[id]++; break;
+        case Saturday: case Sunday: points[id] += 2; weeken[id]++; break;
+        default: break;
         }
     }
 
-    void getScore() {
+    void getScore() override {
         for (int i = 0; i < MAX_DATA_SIZE; i++)
             calculateScore(nodes[i].w, nodes[i].wk);
     }
 
-    void addBonusPoints() {
+    void addBonusPoints() override {
         for (int i = 1; i <= id_cnt; i++) {
-            if (dat[i][Wednesday] > 9) {
-                points[i] += 10;
-            }
-            if (dat[i][Saturday] + dat[i][Sunday] > 9) {
-                points[i] += 10;
-            }
+            if (dat[i][Wednesday] > 9) points[i] += 10;
+            if (dat[i][Saturday] + dat[i][Sunday] > 9) points[i] += 10;
         }
     }
 
-    void judgeGrade() {
-        sort(gradeInfos.begin(), gradeInfos.end(), [](const GradeInfo& a, const GradeInfo& b) {
+    void judgeGrade() override {
+        std::sort(gradeInfos.begin(), gradeInfos.end(), [](const GradeInfo& a, const GradeInfo& b) {
             return a.minScore > b.minScore;
             });
 
@@ -180,54 +135,46 @@ public:
             for (const auto& gi : gradeInfos) {
                 if (points[i] >= gi.minScore) {
                     grade[i] = gi.gradeId;
-                    break;  // 가장 높은 등급 한번만 부여
+                    break;
                 }
             }
         }
     }
 
-    void displayResults() {
+    void displayResults() override {
         for (int i = 1; i <= id_cnt; i++) {
-            cout << "NAME : " << names[i] << ", ";
-            cout << "POINT : " << points[i] << ", ";
-            cout << "GRADE : ";
-
-            if (grade[i] == GRADE_GOLD) {
-                cout << "GOLD\n";
-            }
-            else if (grade[i] == GRADE_SILVER) {
-                cout << "SILVER\n";
-            }
-            else {
-                cout << "NORMAL\n";
-            }
+            std::cout << "NAME : " << names[i] << ", ";
+            std::cout << "POINT : " << points[i] << ", ";
+            std::cout << "GRADE : " << getGradeNameById(grade[i]) << "\n";
         }
 
-        cout << "\nRemoved player\n";
-        cout << "==============\n";
+        std::cout << "\nRemoved player\n==============\n";
         for (int i = 1; i <= id_cnt; i++) {
-            if (grade[i] != GRADE_GOLD && grade[i] != GRADE_SILVER && wed[i] == 0 && weeken[i] == 0) {
-                cout << names[i] << "\n";
-            }
+            if (grade[i] == GRADE_NORMAL && wed[i] == 0 && weeken[i] == 0)
+                std::cout << names[i] << "\n";
         }
     }
 
-    void setGradeThreshold(int gradeId, int newMinScore) {
-        for (auto& gi : gradeInfos) {
+    std::string getGradeNameById(int gradeId) {
+        for (const auto& g : gradeInfos)
+            if (g.gradeId == gradeId)
+                return g.gradeName;
+        return "UNKNOWN";
+    }
+
+    void setGradeThreshold(int gradeId, int newMinScore) override {
+        for (auto& gi : gradeInfos)
             if (gi.gradeId == gradeId) {
                 gi.minScore = newMinScore;
                 break;
             }
-        }
     }
 
-    vector<GradeInfo> getGradeInfos()
-    {
-        return gradeInfos;
-    }
-
-    void addGrade(int gradeId, const string& gradeName, int minScore) {
+    void addGrade(int gradeId, const std::string& gradeName, int minScore) override {
         gradeInfos.push_back({ gradeId, gradeName, minScore });
     }
-};
 
+    std::vector<GradeInfo> getGradeInfos() override {
+        return gradeInfos;
+    }
+};
