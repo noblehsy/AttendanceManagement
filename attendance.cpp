@@ -7,26 +7,35 @@
 
 using namespace std;
 
-#define MAX_SIZE 500
+#define MAX_DATA_SIZE 500
+#define MAX_USER_SIZE 100
+#define MAX_DAYS_SIZE 7
 
 struct Node {
 	string w;
 	string wk;
-}nodes[MAX_SIZE];
+}nodes[MAX_DATA_SIZE];
 
 map<string, int> id1;
 int id_cnt = 0;
 
 //dat[사용자ID][요일]
-int dat[100][100];
-int points[100];
-int grade[100];
-string names[100];
+int dat[MAX_USER_SIZE][MAX_DAYS_SIZE];
+int points[MAX_USER_SIZE];
+int grade[MAX_USER_SIZE];
+string names[MAX_USER_SIZE];
 
-int wed[100];
-int weeken[100];
+int wed[MAX_USER_SIZE];
+int weeken[MAX_USER_SIZE];
 
-void calculateScore (string w, string wk) {
+void getData()
+{
+	ifstream fin{ "attendance_weekday_500.txt" }; //500개 데이터 입력
+	for (int i = 0; i < MAX_DATA_SIZE; i++)
+		fin >> nodes[i].w >> nodes[i].wk;
+}
+
+static void calculateScore (string w, string wk) {
 	//ID 부여
 	if (id1.count(w) == 0) {
 		id1.insert({ w, ++id_cnt });
@@ -84,7 +93,14 @@ void calculateScore (string w, string wk) {
 	points[id2] += add_point;
 }
 
-void input() {
+void getScore()
+{
+	for (int i = 0; i < MAX_DATA_SIZE; i++)
+		calculateScore(nodes[i].w, nodes[i].wk);
+}
+
+void addBonusPoints()
+{
 	for (int i = 1; i <= id_cnt; i++) {
 		if (dat[i][2] > 9) {
 			points[i] += 10;
@@ -103,7 +119,11 @@ void input() {
 		else {
 			grade[i] = 0;
 		}
+	}
+}
 
+void displayResults() {
+	for (int i = 1; i <= id_cnt; i++) {
 		cout << "NAME : " << names[i] << ", ";
 		cout << "POINT : " << points[i] << ", ";
 		cout << "GRADE : ";
@@ -130,21 +150,9 @@ void input() {
 	}
 }
 
-void getData()
-{
-	ifstream fin{ "attendance_weekday_500.txt" }; //500개 데이터 입력
-	for (int i = 0; i < MAX_SIZE; i++)
-		fin >> nodes[i].w >> nodes[i].wk;
-}
-
-void getScore()
-{
-	for (int i = 0; i < MAX_SIZE; i++)
-		calculateScore(nodes[i].w, nodes[i].wk);
-}
-
 int main() {
 	getData();
 	getScore();
-	input();
+	addBonusPoints();
+	displayResults();
 }
