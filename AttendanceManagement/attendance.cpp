@@ -2,6 +2,8 @@
 #include <fstream>
 #include <string>
 #include <map>
+#include <vector>
+#include <algorithm>
 
 using namespace std;
 
@@ -48,6 +50,18 @@ private:
         else return InvalidDay;
     }
 
+    struct GradeInfo {
+        int gradeId;
+        string gradeName;
+        int minScore;
+    };
+
+    vector<GradeInfo> gradeInfos = {
+        {1, "GOLD", SCORE_GOLD},
+        {2, "SILVER", SCORE_SILVER},
+        {0, "NORMAL", 0}
+    };
+
 public:
     int getUserId(const string& username) const {
         auto it = userIds.find(username);
@@ -87,7 +101,7 @@ public:
     }
 
     void getData() {
-        ifstream fin{ "../AttendanceManager/attendance_weekday_500.txt" };
+        ifstream fin{ "../AttendanceManagement/attendance_weekday_500.txt" };
         if (!fin) {
             cerr << "Failed to open file\n";
             return;
@@ -157,15 +171,17 @@ public:
     }
 
     void judgeGrade() {
+        sort(gradeInfos.begin(), gradeInfos.end(), [](const GradeInfo& a, const GradeInfo& b) {
+            return a.minScore > b.minScore;
+            });
+
         for (int i = 1; i <= id_cnt; i++) {
-            if (points[i] >= SCORE_GOLD) {
-                grade[i] = GRADE_GOLD;
-            }
-            else if (points[i] >= SCORE_SILVER) {
-                grade[i] = GRADE_SILVER;
-            }
-            else {
-                grade[i] = GRADE_NORMAL;
+            grade[i] = GRADE_NORMAL;
+            for (const auto& gi : gradeInfos) {
+                if (points[i] >= gi.minScore) {
+                    grade[i] = gi.gradeId;
+                    break;  // 가장 높은 등급 한번만 부여
+                }
             }
         }
     }
@@ -192,6 +208,15 @@ public:
         for (int i = 1; i <= id_cnt; i++) {
             if (grade[i] != GRADE_GOLD && grade[i] != GRADE_SILVER && wed[i] == 0 && weeken[i] == 0) {
                 cout << names[i] << "\n";
+            }
+        }
+    }
+
+    void setGradeThreshold(int gradeId, int newMinScore) {
+        for (auto& gi : gradeInfos) {
+            if (gi.gradeId == gradeId) {
+                gi.minScore = newMinScore;
+                break;
             }
         }
     }
