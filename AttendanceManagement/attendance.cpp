@@ -220,5 +220,14 @@ public:
             }
         }
     }
+
+    vector<GradeInfo> getGradeInfos()
+    {
+        return gradeInfos;
+    }
+
+    void addGrade(int gradeId, const string& gradeName, int minScore) {
+        gradeInfos.push_back({ gradeId, gradeName, minScore });
+    }
 };
 
