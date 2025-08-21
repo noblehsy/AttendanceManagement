@@ -18,6 +18,11 @@ AttendanceManager::AttendanceManager() {
     };
 }
 
+AttendanceManager& AttendanceManager::getInstance() {
+    static AttendanceManager instance;
+    return instance;
+}
+
 Day AttendanceManager::stringToDay(const std::string& wk) {
     if (wk == "monday") return Monday;
     if (wk == "tuesday") return Tuesday;

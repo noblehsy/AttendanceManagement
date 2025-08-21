@@ -9,11 +9,10 @@ protected:
     IAttendanceManager* am;
 
     void SetUp() override {
-        am = new AttendanceManager();  // ≥™¡ﬂø° MockAttendanceManager∑Œ πŸ≤„µµ µ 
+        am = &AttendanceManager::getInstance();  // ΩÃ±€≈Ê ¿ŒΩ∫≈œΩ∫
     }
 
     void TearDown() override {
-        delete am;
     }
 };
 

@@ -31,8 +31,9 @@ private:
 
     Day stringToDay(const std::string& wk);
 
-public:
     AttendanceManager();
+public:
+    static AttendanceManager& getInstance();
 
     int getUserId(const std::string& username) const override;
     int getDat(int userId, Day day) const override;
