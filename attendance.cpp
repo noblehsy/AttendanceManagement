@@ -83,13 +83,6 @@ void input2(string w, string wk) {
 }
 
 void input() {
-	ifstream fin{ "attendance_weekday_500.txt" }; //500개 데이터 입력
-	for (int i = 0; i < 500; i++) {
-		string t1, t2;
-		fin >> t1 >> t2;
-		input2(t1, t2);
-	}
-
 	for (int i = 1; i <= id_cnt; i++) {
 		if (dat[i][2] > 9) {
 			points[i] += 10;
@@ -135,6 +128,17 @@ void input() {
 	}
 }
 
+void getData()
+{
+	ifstream fin{ "attendance_weekday_500.txt" }; //500개 데이터 입력
+	for (int i = 0; i < 500; i++) {
+		string t1, t2;
+		fin >> t1 >> t2;
+		input2(t1, t2);
+	}
+}
+
 int main() {
+	getData();
 	input();
 }
