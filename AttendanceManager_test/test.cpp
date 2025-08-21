@@ -118,3 +118,21 @@ TEST_F(AttendanceManagement_test, TestJudgeGradeUpdateScore) {
     am.judgeGrade();
     EXPECT_EQ(am.getGrade(id), GRADE_GOLD);
 }
+
+TEST_F(AttendanceManagement_test, AddGradeAddsNewGrade) {
+    int initialSize = am.getGradeInfos().size();
+
+    am.addGrade(3, "BRONZE", 10);
+    int newSize = am.getGradeInfos().size();
+    EXPECT_EQ(newSize, initialSize + 1);
+
+    const auto& grades = am.getGradeInfos();
+    bool found = false;
+    for (const auto& g : grades) {
+        if (g.gradeId == 3 && g.gradeName == "BRONZE" && g.minScore == 10) {
+            found = true;
+            break;
+        }
+    }
+    EXPECT_TRUE(found);
+}
