@@ -126,3 +126,15 @@ TEST_F(AttendanceManagement_test, AddGradeAddsNewGrade) {
     }
     EXPECT_TRUE(found);
 }
+
+TEST_F(AttendanceManagement_test, TeststringToDay) {
+    EXPECT_EQ(am->stringToDay("test"), InvalidDay);
+}
+
+TEST_F(AttendanceManagement_test, TestgetDat) {
+    EXPECT_EQ(am->getDat(MAX_USER_SIZE, Monday), -1);
+}
+
+TEST_F(AttendanceManagement_test, TestgetGradeNameById) {
+    EXPECT_EQ(am->getGradeNameById(MAX_USER_SIZE), "UNKNOWN");
+}

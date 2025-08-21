@@ -29,11 +29,10 @@ private:
 
     std::vector<GradeInfo> gradeInfos;
 
-    Day stringToDay(const std::string& wk);
-
     AttendanceManager();
 public:
     static AttendanceManager& getInstance();
+    Day stringToDay(const std::string& wk);
 
     int getUserId(const std::string& username) const override;
     int getDat(int userId, Day day) const override;
@@ -51,5 +50,5 @@ public:
     void addGrade(int gradeId, const std::string& gradeName, int minScore) override;
     std::vector<GradeInfo> getGradeInfos() override;
 
-    std::string getGradeNameById(int gradeId);
+    std::string getGradeNameById(int gradeId) override;
 };

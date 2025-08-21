@@ -13,6 +13,7 @@ struct GradeInfo {
 class IAttendanceManager {
 public:
     virtual ~IAttendanceManager() {}
+    virtual Day stringToDay(const std::string& wk) = 0;
 
     virtual int getUserId(const std::string& username) const = 0;
     virtual int getDat(int userId, Day day) const = 0;
@@ -29,4 +30,5 @@ public:
     virtual void setGradeThreshold(int gradeId, int newMinScore) = 0;
     virtual void addGrade(int gradeId, const std::string& gradeName, int minScore) = 0;
     virtual std::vector<GradeInfo> getGradeInfos() = 0;
+    virtual std::string getGradeNameById(int gradeId) = 0;
 };
