@@ -21,9 +21,7 @@ public:
     virtual int getWed(int userId) const = 0;
     virtual int getWeeken(int userId) const = 0;
 
-    virtual void getData() = 0;
     virtual void calculateScore(const std::string& w, const std::string& wk) = 0;
-    virtual void getScore() = 0;
     virtual void addBonusPoints() = 0;
     virtual void judgeGrade() = 0;
     virtual void displayResults() = 0;
