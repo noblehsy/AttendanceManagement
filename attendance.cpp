@@ -24,7 +24,7 @@ string names[100];
 int wed[100];
 int weeken[100];
 
-void input2(string w, string wk) {
+void calculateScore (string w, string wk) {
 	//ID ºÎ¿©
 	if (id1.count(w) == 0) {
 		id1.insert({ w, ++id_cnt });
@@ -134,7 +134,7 @@ void getData()
 	for (int i = 0; i < 500; i++) {
 		string t1, t2;
 		fin >> t1 >> t2;
-		input2(t1, t2);
+		calculateScore (t1, t2);
 	}
 }
 
