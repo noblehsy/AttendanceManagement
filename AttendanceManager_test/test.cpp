@@ -91,20 +91,20 @@ TEST_F(AttendanceManagement_test, TestDisplayResults) {
 }
 
 TEST_F(AttendanceManagement_test, TestJudgeGradeUpdateScore) {
-    am->calculateScore("Charlie", "monday");
-    int id = am->getUserId("Charlie");
+    am->calculateScore("Disney", "monday");
+    int id = am->getUserId("Disney");
 
     // SILVER if the score is 10 or more
     am->setGradeThreshold(GRADE_SILVER, 10);
     for (int i = 0; i < 10; i++)
-        am->calculateScore("Charlie", "monday");
+        am->calculateScore("Disney", "monday");
     am->judgeGrade();
     EXPECT_EQ(am->getGrade(id), GRADE_SILVER);
 
     // GOLD if the score is 10 or more
     am->setGradeThreshold(GRADE_GOLD, 20);
     for (int i = 0; i < 10; i++)
-        am->calculateScore("Charlie", "monday");
+        am->calculateScore("Disney", "monday");
     am->judgeGrade();
     EXPECT_EQ(am->getGrade(id), GRADE_GOLD);
 }
