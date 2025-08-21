@@ -11,12 +11,19 @@ using namespace std;
 #define MAX_USER_SIZE 100
 #define MAX_DAYS_SIZE 7
 
+#define SCORE_GOLD 50
+#define SCORE_SILVER 30
+
+#define GRADE_NORMAL 0
+#define GRADE_GOLD 1
+#define GRAGE_SILVER 2
+
 struct Node {
 	string w;
 	string wk;
 }nodes[MAX_DATA_SIZE];
 
-map<string, int> id1;
+map<string, int> userIds;
 int id_cnt = 0;
 
 //dat[사용자ID][요일]
@@ -28,6 +35,19 @@ string names[MAX_USER_SIZE];
 int wed[MAX_USER_SIZE];
 int weeken[MAX_USER_SIZE];
 
+enum Day { Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday, InvalidDay };
+
+Day stringToDay(const std::string& wk) {
+	if (wk == "monday") return Monday;
+	else if (wk == "tuesday") return Tuesday;
+	else if (wk == "wednesday") return Wednesday;
+	else if (wk == "thursday") return Thursday;
+	else if (wk == "friday") return Friday;
+	else if (wk == "saturday") return Saturday;
+	else if (wk == "sunday") return Sunday;
+	else return InvalidDay;
+}
+
 void getData()
 {
 	ifstream fin{ "attendance_weekday_500.txt" }; //500개 데이터 입력
@@ -35,10 +55,11 @@ void getData()
 		fin >> nodes[i].w >> nodes[i].wk;
 }
 
+
 static void calculateScore (string w, string wk) {
 	//ID 부여
-	if (id1.count(w) == 0) {
-		id1.insert({ w, ++id_cnt });
+	if (userIds.count(w) == 0) {
+		userIds.insert({ w, ++id_cnt });
 
 		if (w == "Daisy") {
 			int debug = 1;
@@ -46,51 +67,42 @@ static void calculateScore (string w, string wk) {
 
 		names[id_cnt] = w;
 	}
-	int id2 = id1[w];
+	int id = userIds[w];
 
 	//디버깅용
 	if (w == "Daisy") {
 		int debug = 1;
 	}
 
-
-	int add_point = 0;
-	int index = 0;
-	if (wk == "monday") {
-		index = 0;
-		add_point++;
+	Day day = stringToDay(wk);
+	dat[id][day] += 1;
+	switch (day) {
+	case Monday:
+		points[id]++;
+		break;
+	case Tuesday:
+		points[id]++;
+		break;
+	case Wednesday:
+		points[id] += 3;
+		break;
+	case Thursday:
+		points[id]++;
+		break;
+	case Friday:
+		points[id]++;
+		break;
+	case Saturday:
+		points[id] += 2;
+		weeken[id] += 1;
+		break;
+	case Sunday:
+		points[id] += 2;
+		weeken[id] += 1;
+		break;
+	default:
+		break;
 	}
-	if (wk == "tuesday") {
-		index = 1;
-		add_point++;
-	}
-	if (wk == "wednesday") {
-		index = 2;
-		add_point += 3;
-		wed[id2] += 1;
-	}
-	if (wk == "thursday") {
-		index = 3;
-		add_point++;
-	}
-	if (wk == "friday") {
-		index = 4;
-		add_point++;
-	}
-	if (wk == "saturday") {
-		index = 5;
-		add_point += 2;
-		weeken[id2] += 1;
-	}
-	if (wk == "sunday") {
-		index = 6;
-		add_point += 2;
-		weeken[id2] += 1;
-	}
-
-	//사용자ID별 요일 데이터에 1씩 증가
-	dat[id2][index] += 1;
-	points[id2] += add_point;
 }
 
 void getScore()
@@ -109,15 +121,20 @@ void addBonusPoints()
 		if (dat[i][5] + dat[i][6] > 9) {
 			points[i] += 10;
 		}
+	}
+}
 
-		if (points[i] >= 50) {
-			grade[i] = 1;
+void judgeGrade()
+{
+	for (int i = 1; i <= id_cnt; i++) {
+		if (points[i] >= SCORE_GOLD) {
+			grade[i] = GRADE_GOLD;
 		}
-		else if (points[i] >= 30) {
-			grade[i] = 2;
+		else if (points[i] >= SCORE_SILVER) {
+			grade[i] = GRAGE_SILVER;
 		}
 		else {
-			grade[i] = 0;
+			grade[i] = GRADE_NORMAL;
 		}
 	}
 }
@@ -144,7 +161,7 @@ void displayResults() {
 	std::cout << "==============\n";
 	for (int i = 1; i <= id_cnt; i++) {
 
-		if (grade[i] != 1 && grade[i] != 2 && wed[i] == 0 && weeken[i] == 0) {
+		if (grade[i] != GRADE_GOLD && grade[i] != GRAGE_SILVER && wed[i] == 0 && weeken[i] == 0) {
 			std::cout << names[i] << "\n";
 		}
 	}
@@ -154,5 +171,6 @@ int main() {
 	getData();
 	getScore();
 	addBonusPoints();
+	judgeGrade();
 	displayResults();
 }
